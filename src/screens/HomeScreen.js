@@ -38,7 +38,7 @@ export default function HomeScreen() {
       >
         {/* ── Hero ── */}
         <View style={s.hero}>
-          <Text style={s.heroBadge}>✦  FINE JEWELLERY  ✦</Text>
+          <Text style={s.heroBadge}>✦  FOR FINE DIAMOND JEWELLERY  ✦</Text>
           <Text style={s.heroTitle}>HM{'\n'}Diamond</Text>
           <Text style={s.heroSub}>Harshita Marketing</Text>
           <View style={s.heroRule} />

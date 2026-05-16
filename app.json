@@ -2,21 +2,39 @@
   "expo": {
     "name": "HM Diamond",
     "slug": "hm-diamond",
-    "version": "1.0.0",
+    "version": "2.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
+    "description": "HM Diamond – Harshita Marketing. Fine Diamond, Kundan & Polki Jewellery. Browse 1800+ exclusive designs. B2B & retail enquiries via WhatsApp.",
     "splash": {
-      "backgroundColor": "#0a0a0a"
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0d0c09"
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.hmdiamond.app"
+      "bundleIdentifier": "com.hmdiamond.app",
+      "buildNumber": "2"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#0a0a0a"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0d0c09"
       },
-      "package": "com.hmdiamond.app"
+      "package": "com.hmdiamond.app",
+      "versionCode": 3,
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ]
+    },
+    "plugins": [
+      "expo-asset"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "0beee106-d2b9-4400-bf0c-821d8eb8b574"
+      }
     }
   }
 }

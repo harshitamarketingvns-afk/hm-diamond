@@ -2,13 +2,13 @@ export const WHATSAPP_NUMBER = '918887878193';
 
 // Converts a Google Drive file ID to a displayable thumbnail URL.
 // Make sure your H.M Diamond folder is shared as "Anyone with the link can view".
-const gd = (id) => `https://drive.google.com/thumbnail?id=${id}&sz=w400`;
+const gd = (id) => `https://lh3.googleusercontent.com/d/${id}=w800`;
 
 export const STATS = [
-  { num: '15+', label: 'Years' },
-  { num: '5000+', label: 'Clients' },
-  { num: '2000+', label: 'Designs' },
-  { num: '10+', label: 'Cities' },
+  { num: 'Since 2005', label: 'Registered' },
+  { num: '356+', label: 'Jewellers' },
+  { num: '2000+', label: 'Clients' },
+  { num: '75+', label: 'Cities' },
 ];
 
 export const CATEGORIES = [
@@ -401,10 +401,9 @@ export const ABOUT_CARDS = [
     title: 'Gold Purity',
     text: 'We deal in all standard gold purities to suit every need:',
     purityTable: [
-      { karat: '24K', purity: '99.9%', desc: 'Pure Gold' },
-      { karat: '22K', purity: '91.6%', desc: 'Hallmark' },
-      { karat: '18K', purity: '75.0%', desc: 'Diamond Sets' },
+      { karat: '9KT', purity: '37.5%', desc: 'Light Jewellery' },
       { karat: '14K', purity: '58.5%', desc: 'Export Quality' },
+      { karat: '18K', purity: '75.0%', desc: 'Diamond Sets' },
     ],
   },
   {
