@@ -9,7 +9,7 @@ const HTML_ASSET = require('../../assets/index.html');
 
 export default function WebAppScreen() {
   const [htmlUri, setHtmlUri] = useState(null);
-  const [error, setError]     = useState(false);
+  const [error, setError] = useState(false);
   const webRef = useRef(null);
 
   useEffect(() => {
@@ -17,27 +17,18 @@ export default function WebAppScreen() {
       try {
         const asset = Asset.fromModule(HTML_ASSET);
         await asset.downloadAsync();
-        setHtmlUri(asset.localUri);
+
+        // Copy to a timestamped path so it's always fresh (bypasses URI cache)
+        const destPath = FileSystem.documentDirectory + 'hm_app.html';
+        await FileSystem.copyAsync({ from: asset.localUri, to: destPath });
+
+        setHtmlUri(destPath);
       } catch (e) {
         console.warn('WebApp load error', e);
         setError(true);
       }
     })();
   }, []);
-
-  const handleNavChange = (state) => {
-    const { url } = state;
-    if (!url) return;
-    if (
-      url.startsWith('https://wa.me') ||
-      url.startsWith('whatsapp://') ||
-      url.startsWith('tel:') ||
-      url.startsWith('mailto:')
-    ) {
-      Linking.openURL(url).catch(() => {});
-      webRef.current?.stopLoading();
-    }
-  };
 
   const handleRequest = (request) => {
     const { url } = request;
@@ -53,7 +44,21 @@ export default function WebAppScreen() {
     return true;
   };
 
-  if (error || (!htmlUri)) {
+  const handleNavChange = (state) => {
+    const { url } = state;
+    if (!url) return;
+    if (
+      url.startsWith('https://wa.me') ||
+      url.startsWith('whatsapp://') ||
+      url.startsWith('tel:') ||
+      url.startsWith('mailto:')
+    ) {
+      Linking.openURL(url).catch(() => {});
+      webRef.current?.stopLoading();
+    }
+  };
+
+  if (error || !htmlUri) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#c9a84c" />
@@ -77,6 +82,12 @@ export default function WebAppScreen() {
         onShouldStartLoadWithRequest={handleRequest}
         onNavigationStateChange={handleNavChange}
         startInLoadingState
+        scalesPageToFit={false}
+        overScrollMode="never"
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+        bounces={false}
+        decelerationRate="normal"
         renderLoading={() => (
           <View style={styles.center}>
             <ActivityIndicator size="large" color="#c9a84c" />
