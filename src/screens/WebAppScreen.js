@@ -1,34 +1,41 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, ActivityIndicator, StyleSheet, Linking, StatusBar } from 'react-native';
+import {
+  View, ActivityIndicator, StyleSheet, Linking, StatusBar,
+  Modal, TouchableOpacity, Text, Platform,
+} from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Asset } from 'expo-asset';
-import * as FileSystem from 'expo-file-system';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const HTML_ASSET = require('../../assets/index.html');
+const WA = '918887878193';
 
 export default function WebAppScreen() {
-  const [htmlUri, setHtmlUri] = useState(null);
-  const [error, setError] = useState(false);
+  const [htmlUri, setHtmlUri]   = useState(null);
+  const [videoUrl, setVideoUrl] = useState(null);
+  const [videoCode, setVideoCode] = useState('');
+  const [videoWaMsg, setVideoWaMsg] = useState('');
   const webRef = useRef(null);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const asset = Asset.fromModule(HTML_ASSET);
-        await asset.downloadAsync();
-
-        // Copy to a timestamped path so it's always fresh (bypasses URI cache)
-        const destPath = FileSystem.documentDirectory + 'hm_app.html';
-        await FileSystem.copyAsync({ from: asset.localUri, to: destPath });
-
-        setHtmlUri(destPath);
-      } catch (e) {
-        console.warn('WebApp load error', e);
-        setError(true);
-      }
-    })();
+    Asset.fromModule(HTML_ASSET).downloadAsync().then(asset => {
+      setHtmlUri(asset.localUri);
+    });
   }, []);
+
+  // Handle messages from HTML (openVideo)
+  const handleMessage = (event) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.type === 'openVideo') {
+        setVideoCode(data.code || '');
+        setVideoWaMsg(data.waMsg || '');
+        setVideoUrl(`https://drive.google.com/file/d/${data.fileId}/preview`);
+      }
+    } catch (e) {}
+  };
+
+  const closeVideo = () => setVideoUrl(null);
 
   const handleRequest = (request) => {
     const { url } = request;
@@ -44,21 +51,7 @@ export default function WebAppScreen() {
     return true;
   };
 
-  const handleNavChange = (state) => {
-    const { url } = state;
-    if (!url) return;
-    if (
-      url.startsWith('https://wa.me') ||
-      url.startsWith('whatsapp://') ||
-      url.startsWith('tel:') ||
-      url.startsWith('mailto:')
-    ) {
-      Linking.openURL(url).catch(() => {});
-      webRef.current?.stopLoading();
-    }
-  };
-
-  if (error || !htmlUri) {
+  if (!htmlUri) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#c9a84c" />
@@ -69,6 +62,8 @@ export default function WebAppScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <StatusBar barStyle="light-content" backgroundColor="#0d0c09" />
+
+      {/* Main app WebView */}
       <WebView
         ref={webRef}
         source={{ uri: htmlUri }}
@@ -80,26 +75,92 @@ export default function WebAppScreen() {
         allowsInlineMediaPlayback
         mediaPlaybackRequiresUserAction={false}
         onShouldStartLoadWithRequest={handleRequest}
-        onNavigationStateChange={handleNavChange}
+        onMessage={handleMessage}
         startInLoadingState
         scalesPageToFit={false}
         overScrollMode="never"
         showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
         bounces={false}
-        decelerationRate="normal"
+        androidLayerType="hardware"
         renderLoading={() => (
           <View style={styles.center}>
             <ActivityIndicator size="large" color="#c9a84c" />
           </View>
         )}
       />
+
+      {/* Video Modal — separate full-screen WebView, no black screen */}
+      <Modal
+        visible={!!videoUrl}
+        animationType="slide"
+        onRequestClose={closeVideo}
+        statusBarTranslucent
+      >
+        <View style={styles.modalContainer}>
+          {/* Header */}
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalCode}>{videoCode}</Text>
+            <View style={styles.modalActions}>
+              {videoWaMsg ? (
+                <TouchableOpacity
+                  style={styles.waBtn}
+                  onPress={() => Linking.openURL(`https://wa.me/${WA}?text=${encodeURIComponent(videoWaMsg)}`)}
+                >
+                  <Text style={styles.waBtnText}>Enquire</Text>
+                </TouchableOpacity>
+              ) : null}
+              <TouchableOpacity style={styles.closeBtn} onPress={closeVideo}>
+                <Text style={styles.closeBtnText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Drive video WebView — top level, no iframe, no black screen */}
+          <WebView
+            source={{ uri: videoUrl }}
+            style={styles.videoWeb}
+            javaScriptEnabled
+            allowsInlineMediaPlayback
+            mediaPlaybackRequiresUserAction={false}
+            androidLayerType="hardware"
+            allowsProtectedMedia={true}
+            scalesPageToFit={false}
+            startInLoadingState
+            renderLoading={() => (
+              <View style={styles.center}>
+                <ActivityIndicator size="large" color="#c9a84c" />
+              </View>
+            )}
+          />
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe:   { flex: 1, backgroundColor: '#0d0c09' },
-  web:    { flex: 1, backgroundColor: '#0d0c09' },
-  center: { flex: 1, backgroundColor: '#0d0c09', alignItems: 'center', justifyContent: 'center' },
+  safe:            { flex: 1, backgroundColor: '#0d0c09' },
+  web:             { flex: 1, backgroundColor: '#0d0c09' },
+  center:          { flex: 1, backgroundColor: '#0d0c09', alignItems: 'center', justifyContent: 'center' },
+  modalContainer:  { flex: 1, backgroundColor: '#000' },
+  modalHeader:     {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    backgroundColor: '#141208', paddingHorizontal: 16, paddingVertical: 12,
+    paddingTop: (StatusBar.currentHeight || 44) + 8,
+    borderBottomWidth: 1, borderBottomColor: '#2a2518',
+  },
+  modalCode:       { color: '#8a6d2a', fontSize: 13, letterSpacing: 2, flex: 1 },
+  modalActions:    { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  waBtn:           {
+    backgroundColor: '#25d366', paddingHorizontal: 14, paddingVertical: 8,
+    borderRadius: 20,
+  },
+  waBtnText:       { color: '#fff', fontSize: 12, fontWeight: '700' },
+  closeBtn:        {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: '#1a1810', borderWidth: 1, borderColor: '#2a2518',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  closeBtnText:    { color: '#fff', fontSize: 18, lineHeight: 20 },
+  videoWeb:        { flex: 1, backgroundColor: '#000' },
 });
