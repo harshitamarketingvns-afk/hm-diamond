@@ -451,9 +451,53 @@
     color: var(--goldL);
     text-transform: uppercase;
   }
+
+  /* ── INTRO VIDEO SPLASH ── */
+  #intro-splash {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #000;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 0.8s ease;
+  }
+  #intro-splash.fade-out { opacity: 0; pointer-events: none; }
+  #intro-frame {
+    width: 100%; height: 100%;
+    border: none; position: absolute; inset: 0;
+  }
+  #intro-skip {
+    position: absolute; bottom: 32px; right: 20px;
+    z-index: 10;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 12px; letter-spacing: 2px;
+    padding: 10px 20px; border-radius: 30px;
+    cursor: pointer; text-transform: uppercase;
+    backdrop-filter: blur(4px);
+  }
+  #intro-logo {
+    position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 10;
+    font-size: 11px; letter-spacing: 5px; color: var(--gold);
+    text-transform: uppercase; text-align: center;
+    text-shadow: 0 0 20px rgba(201,168,76,0.5);
+  }
 </style>
 </head>
 <body>
+
+<!-- ── INTRO VIDEO SPLASH ── -->
+<div id="intro-splash">
+  <div id="intro-logo">✦ &nbsp; HM DIAMOND &nbsp; ✦</div>
+  <iframe
+    id="intro-frame"
+    src="https://drive.google.com/file/d/1GvaN2QMgcJxhlqmP8s_fTovTdmjLYoCU/preview"
+    allow="autoplay; encrypted-media"
+    allowfullscreen
+  ></iframe>
+  <button id="intro-skip" onclick="dismissIntro()">Skip ▶</button>
+</div>
 
 <!-- OFFER TICKER -->
 <div class="offer-ticker">
@@ -2788,6 +2832,34 @@ render();
     </div>
   </div>
 </div>
+
+<script>
+/* ── INTRO VIDEO ── */
+(function() {
+  var splash = document.getElementById('intro-splash');
+  if (!splash) return;
+
+  /* Auto-dismiss after 60 seconds max */
+  var autoTimer = setTimeout(function() { dismissIntro(); }, 60000);
+
+  window.dismissIntro = function() {
+    clearTimeout(autoTimer);
+    splash.classList.add('fade-out');
+    setTimeout(function() { splash.style.display = 'none'; }, 850);
+  };
+
+  /* If no internet, skip after 6 seconds */
+  setTimeout(function() {
+    var frame = document.getElementById('intro-frame');
+    try {
+      if (frame && (!frame.contentDocument || !frame.contentDocument.body ||
+          frame.contentDocument.body.innerHTML.length < 50)) {
+        dismissIntro();
+      }
+    } catch(e) { /* cross-origin: video loaded fine */ }
+  }, 6000);
+})();
+</script>
 
 </body>
 </html>
