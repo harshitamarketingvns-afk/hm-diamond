@@ -413,6 +413,44 @@
 
   /* ── HIDDEN ── */
   .hidden { display: none !important; }
+
+  /* ── BANARASI MODEL BANNER ── */
+  .model-banner {
+    width: 100%;
+    height: 420px;
+    background-image: url('banarasi-model.jpg');
+    background-size: 175%;
+    background-position: 10% 32%;
+    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
+  }
+  .model-banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(13,12,9,0.15) 0%,
+      transparent 30%,
+      transparent 65%,
+      rgba(13,12,9,0.85) 100%
+    );
+  }
+  .model-banner-text {
+    position: absolute;
+    bottom: 20px;
+    left: 0; right: 0;
+    text-align: center;
+    z-index: 2;
+    padding: 0 20px;
+  }
+  .model-banner-text p {
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--goldL);
+    text-transform: uppercase;
+  }
 </style>
 </head>
 <body>
@@ -455,6 +493,13 @@
   <p class="hero-sub">Harshita Marketing</p>
   <div class="hero-rule"></div>
   <p class="hero-tagline">Where Every Jewel Tells a Story</p>
+</div>
+
+<!-- BANARASI MODEL BANNER -->
+<div class="model-banner">
+  <div class="model-banner-text">
+    <p>✦ &nbsp; A Lifelong Memory &nbsp; ✦</p>
+  </div>
 </div>
 
 <!-- STATS -->

@@ -22,7 +22,7 @@
         "backgroundColor": "#0d0c09"
       },
       "package": "com.hmdiamond.app",
-      "versionCode": 3,
+      "versionCode": 4,
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE"
