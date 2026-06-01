@@ -424,6 +424,7 @@
     background-repeat: no-repeat;
     position: relative;
     overflow: hidden;
+    margin-top: 0;
   }
   .model-banner::after {
     content: '';
@@ -452,52 +453,40 @@
     text-transform: uppercase;
   }
 
-  /* ── INTRO VIDEO SPLASH ── */
-  #intro-splash {
-    position: fixed; inset: 0; z-index: 9999;
+  /* ── INLINE HERO VIDEO ── */
+  .hero-video-wrap {
+    width: 100%;
     background: #000;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    transition: opacity 0.8s ease;
+    border-top: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0;
   }
-  #intro-splash.fade-out { opacity: 0; pointer-events: none; }
-  #intro-frame {
-    width: 100%; height: 100%;
-    border: none; position: absolute; inset: 0;
+  .hero-video-frame {
+    display: block;
+    width: 100%;
+    height: 56vw;
+    min-height: 220px;
+    max-height: 480px;
+    border: none;
+    background: #000;
+    margin-bottom: -6px;
   }
-  #intro-skip {
-    position: absolute; bottom: 32px; right: 20px;
+  .video-skip-btn {
+    position: absolute;
+    bottom: 14px; right: 14px;
     z-index: 10;
-    background: rgba(201,168,76,0.15);
-    border: 1px solid var(--gold);
+    background: rgba(0,0,0,0.65);
+    border: 1.5px solid var(--gold);
     color: var(--gold);
-    font-size: 12px; letter-spacing: 2px;
-    padding: 10px 20px; border-radius: 30px;
-    cursor: pointer; text-transform: uppercase;
+    font-size: 13px; font-weight: 600;
+    padding: 9px 20px; border-radius: 30px;
+    cursor: pointer; letter-spacing: 1px;
     backdrop-filter: blur(4px);
-  }
-  #intro-logo {
-    position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
-    z-index: 10;
-    font-size: 11px; letter-spacing: 5px; color: var(--gold);
-    text-transform: uppercase; text-align: center;
-    text-shadow: 0 0 20px rgba(201,168,76,0.5);
   }
 </style>
 </head>
 <body>
-
-<!-- ── INTRO VIDEO SPLASH ── -->
-<div id="intro-splash">
-  <div id="intro-logo">✦ &nbsp; HM DIAMOND &nbsp; ✦</div>
-  <iframe
-    id="intro-frame"
-    src="https://drive.google.com/file/d/1GvaN2QMgcJxhlqmP8s_fTovTdmjLYoCU/preview"
-    allow="autoplay; encrypted-media"
-    allowfullscreen
-  ></iframe>
-  <button id="intro-skip" onclick="dismissIntro()">Skip ▶</button>
-</div>
 
 <!-- OFFER TICKER -->
 <div class="offer-ticker">
@@ -537,6 +526,19 @@
   <p class="hero-sub">Harshita Marketing</p>
   <div class="hero-rule"></div>
   <p class="hero-tagline">Where Every Jewel Tells a Story</p>
+</div>
+
+<!-- HERO VIDEO -->
+<div class="hero-video-wrap">
+  <iframe
+    class="hero-video-frame"
+    src="https://drive.google.com/file/d/1GvaN2QMgcJxhlqmP8s_fTovTdmjLYoCU/preview"
+    frameborder="0"
+    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+    allowfullscreen
+    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+  ></iframe>
+  <button class="video-skip-btn" onclick="document.querySelector('.model-banner').scrollIntoView({behavior:'smooth'})">Skip ▶</button>
 </div>
 
 <!-- BANARASI MODEL BANNER -->
@@ -2833,33 +2835,6 @@ render();
   </div>
 </div>
 
-<script>
-/* ── INTRO VIDEO ── */
-(function() {
-  var splash = document.getElementById('intro-splash');
-  if (!splash) return;
-
-  /* Auto-dismiss after 60 seconds max */
-  var autoTimer = setTimeout(function() { dismissIntro(); }, 60000);
-
-  window.dismissIntro = function() {
-    clearTimeout(autoTimer);
-    splash.classList.add('fade-out');
-    setTimeout(function() { splash.style.display = 'none'; }, 850);
-  };
-
-  /* If no internet, skip after 6 seconds */
-  setTimeout(function() {
-    var frame = document.getElementById('intro-frame');
-    try {
-      if (frame && (!frame.contentDocument || !frame.contentDocument.body ||
-          frame.contentDocument.body.innerHTML.length < 50)) {
-        dismissIntro();
-      }
-    } catch(e) { /* cross-origin: video loaded fine */ }
-  }, 6000);
-})();
-</script>
 
 </body>
 </html>
